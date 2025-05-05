@@ -59,7 +59,7 @@ Review.getAll = (result) => {
     }
   );
 };
-
+//comment
 Review.findByPerfumeId = (perfumeId, result) => {
   sql.query(
     `SELECT *,users.name AS user_name FROM reviews INNER JOIN users ON reviews.user_id = users.id WHERE perfume_id = ${perfumeId}`,
