@@ -138,8 +138,8 @@ note.findByName = (name, result) => {
 // Update a note by ID
 note.updateById = (id, note, result) => {
   sql.query(
-    "UPDATE notes SET name = ?, icon = ? WHERE id = ?",
-    [note.name, note.icon, id],
+    "UPDATE notes SET name = ?, icon = ?, note_type = ? WHERE id = ?",
+    [note.name, note.icon, note.note_type, id],
     (err, res) => {
       if (err) {
         console.log("Error: ", err);
