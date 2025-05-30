@@ -42,9 +42,10 @@ exports.create = (req, res) => {
   const perfume = new Perfume({
     title: req.body.title,
     description: req.body.description,
+    stock: req.body.stock || 0,
     published: req.body.published || false,
     image: req.body.image,
-    label: req.body.label,
+    label: req.body.label || "none",
     category: req.body.category,
     size: sizeString,
   });
@@ -82,7 +83,7 @@ exports.findAll = (req, res) => {
         message:
           err.message || "Some error occurred while retrieving perfumes.",
       });
-    else res.send(data); 
+    else res.send(data);
   });
 };
 
@@ -92,8 +93,7 @@ exports.search = (req, res) => {
   Perfume.searchPerfumes(searchTerm, (err, data) => {
     if (err)
       res.status(500).send({
-        message:
-          err.message || "Some error occurred while searching perfumes.",
+        message: err.message || "Some error occurred while searching perfumes.",
       });
     else res.send(data); // Now includes brands
   });
@@ -105,7 +105,7 @@ exports.mostorder = (req, res) => {
       console.error("Error fetching most ordered perfumes:", err);
       return res.status(500).json({
         message: "Error retrieving most ordered perfumes",
-        error: err.message
+        error: err.message,
       });
     }
     res.status(200).json(data);
@@ -217,6 +217,7 @@ exports.update = (req, res) => {
     label: req.body.label,
     category: req.body.category,
     size: sizeString,
+    stock: req.body.stock,
   });
 
   Perfume.updateById(req.params.id, perfume, (err, data) => {

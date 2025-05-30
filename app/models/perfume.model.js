@@ -9,6 +9,7 @@ const Perfume = function (perfume) {
   this.label = perfume.label;
   this.category = perfume.category;
   this.size = perfume.size;
+  this.stock = perfume.stock;
 };
 
 const fetchBrandsForPerfume = (perfumeId, callback) => {
@@ -338,7 +339,7 @@ Perfume.findByCategory = (category, result) => {
 
 Perfume.updateById = (id, perfume, result) => {
   sql.query(
-    "UPDATE perfumes SET title = ?, description = ?, published = ?, image = ?, category = ?, label = ?, size = ? WHERE id = ?",
+    "UPDATE perfumes SET title = ?, description = ?, published = ?, image = ?, category = ?, label = ?, size = ?,stock=? WHERE id = ?",
     [
       perfume.title,
       perfume.description,
@@ -347,6 +348,7 @@ Perfume.updateById = (id, perfume, result) => {
       perfume.category,
       perfume.label,
       perfume.size,
+      perfume.stock,
       id,
     ],
     (err, res) => {
@@ -359,8 +361,15 @@ Perfume.updateById = (id, perfume, result) => {
         result({ kind: "not_found" }, null);
         return;
       }
-      console.log("updated perfume: ", { id: id, ...perfume });
-      result(null, { id: id, ...perfume });
+      const updatedPerfume = {
+        id: id,
+        ...perfume,
+        imageUrl: `${baseUrl}/images/${perfume.image}`,
+      };
+
+      console.log("updated perfume: ", updatedPerfume);
+
+      result(null, updatedPerfume);
     }
   );
 };
