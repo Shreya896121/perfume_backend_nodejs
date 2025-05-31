@@ -122,7 +122,11 @@ Brand.updateById = (id, brand, result) => {
         result({ kind: "not_found" }, null);
         return;
       }
-
+      const updatedBrand = {
+        id: id,
+        ...perfume,
+        imageUrl: `${baseUrl}/images/${brand.image}`,
+      };
       console.log("Updated brand: ", { id, ...brand });
       result(null, { id, ...brand });
     }

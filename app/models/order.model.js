@@ -7,7 +7,7 @@ const Order = function (order) {
   this.Status = order.Status;
   this.Price = order.Price;
   this.User_id = order.User_id;
-  this.cart = JSON.stringify(order.cart); 
+  this.cart = JSON.stringify(order.cart);
 };
 
 Order.create = (newOrder, result) => {
@@ -43,25 +43,25 @@ Order.create = (newOrder, result) => {
 };
 
 Order.findByUserId = (userId, result) => {
-    sql.query("SELECT * FROM Orders WHERE User_id = ?", [userId], (err, res) => {
-      if (err) {
-        console.log("error: ", err);
-        result(err, null);
-        return;
-      }
-      if (res.length) {
-        const orders = res.map((order) => ({
-          ...order,
-          cart: JSON.parse(order.cart), // Parse cart JSON string
-        }));
-        console.log("found orders: ", orders);
-        result(null, orders);
-      } else {
-        result({ kind: "not_found" }, null);
-      }
-    });
-  };
-  
+  sql.query("SELECT * FROM Orders WHERE User_id = ?", [userId], (err, res) => {
+    if (err) {
+      console.log("error: ", err);
+      result(err, null);
+      return;
+    }
+    if (res.length) {
+      const orders = res.map((order) => ({
+        ...order,
+        cart: JSON.parse(order.cart), // Parse cart JSON string
+      }));
+      console.log("found orders: ", orders);
+      result(null, orders);
+    } else {
+      result({ kind: "not_found" }, null);
+    }
+  });
+};
+
 Order.findById = (id, result) => {
   sql.query("SELECT * FROM Orders WHERE id = ?", [id], (err, res) => {
     if (err) {
@@ -84,19 +84,22 @@ Order.findById = (id, result) => {
 
 // Get all orders
 Order.getAll = (result) => {
-  sql.query("SELECT *, Orders.id as order_pid FROM Orders LEFT JOIN users ON users.id = Orders.user_id", (err, res) => {
-    if (err) {
-      console.log("error: ", err);
-      result(null, err);
-      return;
+  sql.query(
+    "SELECT *, Orders.id as order_pid FROM Orders LEFT JOIN users ON users.id = Orders.user_id",
+    (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(null, err);
+        return;
+      }
+      const orders = res.map((order) => ({
+        ...order,
+        cart: JSON.parse(order.cart), // Parse cart JSON string
+      }));
+      console.log("orders: ", orders);
+      result(null, orders);
     }
-    const orders = res.map((order) => ({
-      ...order,
-      cart: JSON.parse(order.cart), // Parse cart JSON string
-    }));
-    console.log("orders: ", orders);
-    result(null, orders);
-  });
+  );
 };
 
 // Update an order by ID
@@ -165,7 +168,7 @@ Order.updateStatus = (id, order, result) => {
           if (updatedOrder.Status === "completed") {
             try {
               const cartItems = JSON.parse(updatedOrder.cart);
-              
+
               // Process each item in the cart
               cartItems.forEach((item) => {
                 sql.query(
@@ -173,12 +176,19 @@ Order.updateStatus = (id, order, result) => {
                   [item.quantity, item.id],
                   (stockErr, stockRes) => {
                     if (stockErr) {
-                      console.log(`Error updating stock for perfume ${item.id}: `, stockErr);
+                      console.log(
+                        `Error updating stock for perfume ${item.id}: `,
+                        stockErr
+                      );
                       // Note: We're not returning error to client here to continue processing other items
                     } else if (stockRes.affectedRows === 0) {
-                      console.log(`Perfume with id ${item.id} not found for stock update`);
+                      console.log(
+                        `Perfume with id ${item.id} not found for stock update`
+                      );
                     } else {
-                      console.log(`Updated stock for perfume ${item.id}, subtracted ${item.quantity}`);
+                      console.log(
+                        `Updated stock for perfume ${item.id}, subtracted ${item.quantity}`
+                      );
                     }
                   }
                 );
